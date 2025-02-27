@@ -1,40 +1,42 @@
 package com.example.todoapp.models;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
+@Setter
 @Entity
-public class Task  {
+@Table(name = "tasks") // Explicitly naming the table
+public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
-    private boolean completed;
-
-    @Setter
     private String author;
+    private BigDecimal price;
+    private String description;
+    private String coverImage;
+    private String category;
+    private Boolean featured;
 
-    @Setter
-    private double price;
 
-    //Constructors
-
-    public Task(){
-
+    // Default constructor
+    public Task() {
     }
 
-    public Task(String title, boolean completed){
+    // Constructor with all fields
+    public Task(String title, String author, BigDecimal price, String description, String coverImage, String category, Boolean featured, Boolean completed) {
         this.title = title;
-        this.completed = completed;
-    }
+        this.author = author;
+        this.price = price;
+        this.description = description;
+        this.coverImage = coverImage;
+        this.category = category;
+        this.featured = featured;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
     }
 }

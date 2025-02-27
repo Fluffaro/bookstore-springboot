@@ -26,15 +26,18 @@ public class TaskService {
     }
 
     public Task createTask(Task task) {
-
         return taskRepository.save(task);
-
     }
 
     public Task updateTask(Long id, Task updatedTask){
         return taskRepository.findById(id).map(task -> {
             task.setTitle(updatedTask.getTitle());
-            task.setCompleted(updatedTask.isCompleted());
+            task.setAuthor(updatedTask.getAuthor());
+            task.setPrice(updatedTask.getPrice());
+            task.setDescription(updatedTask.getDescription());
+            task.setCoverImage(updatedTask.getCoverImage());
+            task.setCategory(updatedTask.getCategory());
+            task.setFeatured(updatedTask.getFeatured());
             return taskRepository.save(task);
         }).orElse(null);
     }
