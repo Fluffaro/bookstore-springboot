@@ -13,7 +13,7 @@ import java.util.Set;
 
 @Component
 public class JwtUtil {
-    private final String SECRET_KEY = "mariesecretkeyandmneilsecretkeyforlife55555";
+    private final String SECRET_KEY = "3458934898923840238042482384jkdfgkdfkgjdfkjgrdr9898890";
 
     public String generateToken(String username, Set<String> roles) {
         return Jwts.builder()
