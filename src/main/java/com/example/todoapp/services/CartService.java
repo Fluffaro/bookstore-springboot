@@ -2,11 +2,11 @@ package com.example.todoapp.services;
 
 import com.example.todoapp.models.Cart;
 import com.example.todoapp.models.CartItem;
-import com.example.todoapp.models.Task;
+import com.example.todoapp.models.Book;
 import com.example.todoapp.models.User;
 import com.example.todoapp.repositories.CartItemRepository;
 import com.example.todoapp.repositories.CartRepository;
-import com.example.todoapp.repositories.TaskRepository;
+import com.example.todoapp.repositories.BookRepository;
 import com.example.todoapp.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,16 +18,18 @@ import java.util.Optional;
 public class CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final TaskRepository taskRepository;
+    private final BookRepository bookRepository;
     private final UserRepository userRepository;
 
     public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository,
-                       TaskRepository taskRepository, UserRepository userRepository) {
+                       BookRepository bookRepository, UserRepository userRepository) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
-        this.taskRepository = taskRepository;
+        this.bookRepository = bookRepository;
         this.userRepository = userRepository;
     }
+
+
 
     public Cart getCartByUser(User user) {
         return cartRepository.findByUser(user).orElseGet(() -> {
@@ -35,6 +37,50 @@ public class CartService {
             return cartRepository.save(newCart);
         });
     }
+    @Transactional
+    public Cart updateCartItem(String username, Long bookId, int newQuantity) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Cart cart = getCartByUser(user);
+
+        Optional<CartItem> existingItem = cart.getCartItems().stream()
+                .filter(item -> item.getBook().getId().equals(bookId))
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+            CartItem cartItem = existingItem.get();
+            if (newQuantity <= 0) {
+                cart.getCartItems().remove(cartItem);
+                cartItemRepository.delete(cartItem);
+            } else {
+                cartItem.setQuantity(newQuantity);
+                cartItemRepository.save(cartItem);
+            }
+        } else {
+            throw new RuntimeException("Book not found in cart");
+        }
+
+        return cartRepository.save(cart);
+    }
+
+
+    // ✅ Clear all items from the cart
+    @Transactional
+    public void clearCart(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Cart cart = getCartByUser(user);
+
+        // Delete all items from the cart
+        cartItemRepository.deleteByCart(cart);
+
+        // Clear the cart list (ensures cache/state updates)
+        cart.getCartItems().clear();
+        cartRepository.save(cart);
+    }
+
 
     public Cart getCartByUsername(String username) {
         User user = userRepository.findByUsername(username)
@@ -48,7 +94,7 @@ public class CartService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Task book = taskRepository.findById(bookId)
+        Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
 
         Cart cart = getCartByUser(user);

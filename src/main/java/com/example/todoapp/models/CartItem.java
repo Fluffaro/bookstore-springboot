@@ -21,13 +21,13 @@ public class CartItem {
 
     @ManyToOne
     @JoinColumn(name = "book_id", nullable = false)
-    private Task book;  // Keeping Task as your book entity
+    private Book book;  // Keeping Task as your book entity
 
     private int quantity;
 
     public CartItem() {}
 
-    public CartItem(Cart cart, Task book, int quantity) {
+    public CartItem(Cart cart, Book book, int quantity) {
         this.cart = cart;
         this.book = book;
         this.quantity = quantity;

@@ -35,6 +35,17 @@ public class CartController {
         return ResponseEntity.ok(updatedCart);
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<?> updateCartItem(@RequestBody CartItemRequest request, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(403).body("Unauthorized - No user found");
+        }
+
+        String username = principal.getName();
+        Cart updatedCart = cartService.updateCartItem(username, request.getBookId(), request.getQuantity());
+        return ResponseEntity.ok(updatedCart);
+    }
+
 
     // ✅ Get Cart Items (Including Quantity)
     @GetMapping
